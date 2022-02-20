@@ -17,6 +17,13 @@ public class GridSystem : MonoBehaviour
     public const int Width = 32;
     public const int Height = 20;
 
+    public string levelName = "";
+
+    public Vector2Int startPos = Vector2Int.zero;
+    public Direction startDirection = Direction.SOUTH;
+    public Vector2Int endPos = new(Width - 1, Height - 1);
+    public List<EndOfIntersection> endOfIntersections = new();
+
     private TerrainType[,] Values;
 
     public GridSystem()
@@ -24,23 +31,58 @@ public class GridSystem : MonoBehaviour
         Values = new TerrainType[Width, Height];
     }
 
+    public static Direction DirectionFrom(string direction)
+    {
+        switch (direction)
+        {
+            case "NORTH": return Direction.NORTH;
+            case "SOUTH": return Direction.SOUTH;
+            case "EAST": return Direction.EAST;
+            case "WEST": return Direction.WEST;
+            default: return Direction.NORTH;
+        }
+    }
+
     public static GridSystem LoadFromFile(string levelName)
     {
-        string levelFilePath = "../Assets/Terrains/" + levelName + ".txt";
-        string[] lines = File.ReadAllLines(levelFilePath);
+        string levelFilePath = "../Assets/Terrains/" + levelName;
+        string[] linesArray = File.ReadAllLines(levelFilePath);
+        List<string> lines = new List<string>(linesArray);
 
         GridSystem grid = new();
-
+        grid.levelName = levelName.Replace(".txt", "");
         for (int y = 0; y < Height; y++)
         {
-            string[] values = lines[y].Split(",");
             for (int x = 0; x < Width; x++)
             {
-                TerrainType value = TerrainData.From(values[x]);
+                TerrainType value = TerrainData.From(lines[y][x].ToString());
                 grid.SetValue(value, x, y);
             }
         }
-        
+        // Start pos
+        lines = lines.GetRange(Height, lines.Count - Height);
+        string[] startvalues = lines[0].Split(",");
+        grid.startPos = new Vector2Int(int.Parse(startvalues[0]), int.Parse(startvalues[1]));
+        grid.startDirection = DirectionFrom(startvalues[2]);
+
+        // End of intersections
+        lines = lines.GetRange(1, lines.Count - 1);
+        for (int i = 0; i < int.Parse(lines[0]); ++i)
+        {
+            grid.endOfIntersections.Add(new EndOfIntersection());
+
+            string[] intersectionvalues = lines[i + 1].Split(",");
+            grid.endOfIntersections[i].position = new Vector2Int(int.Parse(intersectionvalues[0]), int.Parse(intersectionvalues[1]));
+            grid.endOfIntersections[i].endDirection = DirectionFrom(intersectionvalues[2]);
+        }
+
+        // End pos
+        lines = lines.GetRange(int.Parse(lines[0]) + 1, 1);
+        foreach (var line in lines)
+            Debug.Log(line);
+        string[] endValues = lines[0].Split(",");
+        grid.endPos = new Vector2Int(int.Parse(endValues[0]), int.Parse(endValues[1]));
+
         return grid;
     }
 
@@ -185,7 +227,7 @@ public class GridSystem : MonoBehaviour
             }
         }
     }
-    public async void SaveToFile(string levelName, Vector2Int startPos, Direction startDirection, Vector2Int endPos, List<EndOfIntersection> endOfIntersections)
+    public async void SaveToFile()
     {
         if (!Directory.Exists("../Assets/Terrains")) Directory.CreateDirectory("../Assets/Terrains");
         string levelFilePath = "../Assets/Terrains/" + levelName + ".txt";

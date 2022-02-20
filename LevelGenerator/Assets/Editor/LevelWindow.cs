@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
@@ -13,17 +14,11 @@ public class EndOfIntersection
 public class LevelWindow : EditorWindow
 {
     private GridSystem grid = new();
-    private string levelName = "";
 
-    private Vector2Int startPos = Vector2Int.zero;
-    private Direction startDirection = Direction.SOUTH;
-    private Vector2Int endPos = new (GridSystem.Width, GridSystem.Height);
-    private List<EndOfIntersection> endOfIntersections = new ();
-
-    private GUIStyle borderStart;
-    private GUIStyle borderEnd;
-
+    private Vector2 globalScroll;
     private Vector2 endOfIntersectionsScroll;
+
+    private int selectedLevelPopup;
 
     [MenuItem("Game/Level")]
     public static void Init()
@@ -33,6 +28,9 @@ public class LevelWindow : EditorWindow
 
     void OnGUI()
     {
+        globalScroll = GUILayout.BeginScrollView(globalScroll, false, true);
+        LoadFromFiles();
+        Separator();
         ShowHeader();
         Separator();
 
@@ -49,6 +47,7 @@ public class LevelWindow : EditorWindow
         GUILayout.EndVertical();
 
         GUILayout.EndHorizontal();
+        GUILayout.EndScrollView();
     }
 
     private void ResetBackgroundColor() { GUI.backgroundColor = Color.white; }
@@ -58,24 +57,39 @@ public class LevelWindow : EditorWindow
         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
     }
 
+    private void LoadFromFiles()
+    {
+        GUILayout.BeginHorizontal();
+
+        string[] fileNames = Directory.GetFiles("../Assets/Terrains/");
+        for (int i = 0; i < fileNames.Length; ++i)
+            fileNames[i] = fileNames[i].Replace("../Assets/Terrains/", "");
+
+        selectedLevelPopup = EditorGUILayout.Popup("Levels", selectedLevelPopup, fileNames);
+        if (GUILayout.Button("Load"))
+            grid = GridSystem.LoadFromFile(fileNames[selectedLevelPopup]);
+
+        GUILayout.EndHorizontal();
+    }
+
     private void ShowHeader()
     {        
         // Header
         GUILayout.Label("Level Name");
-        levelName = GUILayout.TextField(levelName);
+        grid.levelName = GUILayout.TextField(grid.levelName);
 
         GUILayout.Space(16);
 
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical();
-        startPos.x = EditorGUILayout.IntSlider("Start position x", startPos.x, 0, GridSystem.Width - 1);
-        startPos.y = EditorGUILayout.IntSlider("Start position y", startPos.y, 0, GridSystem.Height - 1);
-        startDirection = (Direction)EditorGUILayout.EnumPopup("Start direction", startDirection);
+        grid.startPos.x = EditorGUILayout.IntSlider("Start position x", grid.startPos.x, 0, GridSystem.Width - 1);
+        grid.startPos.y = EditorGUILayout.IntSlider("Start position y", grid.startPos.y, 0, GridSystem.Height - 1);
+        grid.startDirection = (Direction)EditorGUILayout.EnumPopup("Start direction", grid.startDirection);
         GUILayout.EndVertical();
 
         GUILayout.BeginVertical();
-        endPos.x = EditorGUILayout.IntSlider("End position x", endPos.x, 0, GridSystem.Width - 1);
-        endPos.y = EditorGUILayout.IntSlider("End position y", endPos.y, 0, GridSystem.Height - 1);
+        grid.endPos.x = EditorGUILayout.IntSlider("End position x", grid.endPos.x, 0, GridSystem.Width - 1);
+        grid.endPos.y = EditorGUILayout.IntSlider("End position y", grid.endPos.y, 0, GridSystem.Height - 1);
         GUILayout.EndVertical();
         GUILayout.EndHorizontal();
 
@@ -84,7 +98,7 @@ public class LevelWindow : EditorWindow
         // Buttons
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Reset Values")) { grid.Clear(); }
-        if (GUILayout.Button("Save Level")) { grid.SaveToFile(levelName, startPos, startDirection, endPos, endOfIntersections); }
+        if (GUILayout.Button("Save Level")) { grid.SaveToFile(); }
         GUILayout.EndHorizontal();
     }
 
@@ -92,20 +106,20 @@ public class LevelWindow : EditorWindow
     {
         GUILayout.BeginHorizontal();
         GUILayout.Label("End of intersections");
-        if (GUILayout.Button("+", GUILayout.Width(64))) { endOfIntersections.Add(new EndOfIntersection()); }
-        if (GUILayout.Button("-", GUILayout.Width(64))) { endOfIntersections.RemoveAt(endOfIntersections.Count - 1); }
+        if (GUILayout.Button("+", GUILayout.Width(64))) { grid.endOfIntersections.Add(new EndOfIntersection()); }
+        if (GUILayout.Button("-", GUILayout.Width(64))) { grid.endOfIntersections.RemoveAt(grid.endOfIntersections.Count - 1); }
         GUILayout.EndHorizontal();
 
         Separator();
 
         // End of intersections
-        for (int i = 0; i < endOfIntersections.Count; ++i)
+        for (int i = 0; i < grid.endOfIntersections.Count; ++i)
         {
             if (i != 0) Separator();
             GUILayout.BeginVertical();
-            endOfIntersections[i].position.x = EditorGUILayout.IntSlider("Intersection x", endOfIntersections[i].position.x, 0, GridSystem.Width - 1);
-            endOfIntersections[i].position.y = EditorGUILayout.IntSlider("Intersection y", endOfIntersections[i].position.y, 0, GridSystem.Height - 1);
-            endOfIntersections[i].endDirection = (Direction)EditorGUILayout.EnumPopup("Intersection direction", endOfIntersections[i].endDirection);
+            grid.endOfIntersections[i].position.x = EditorGUILayout.IntSlider("Intersection x", grid.endOfIntersections[i].position.x, 0, GridSystem.Width - 1);
+            grid.endOfIntersections[i].position.y = EditorGUILayout.IntSlider("Intersection y", grid.endOfIntersections[i].position.y, 0, GridSystem.Height - 1);
+            grid.endOfIntersections[i].endDirection = (Direction)EditorGUILayout.EnumPopup("Intersection direction", grid.endOfIntersections[i].endDirection);
             GUILayout.EndVertical();
         }
     }
@@ -180,9 +194,9 @@ public class LevelWindow : EditorWindow
 
                 // Single cell button
                 grid.GetValue(x, y).SetBackGround();
-                if (new Vector2Int(x, y) == startPos) GUI.backgroundColor = Color.magenta;
-                if (new Vector2Int(x, y) == endPos) GUI.backgroundColor = Color.cyan;
-                if (endOfIntersections.Any(endOfIntersection => endOfIntersection.position == new Vector2Int(x, y))) GUI.backgroundColor = Color.white;
+                if (new Vector2Int(x, y) == grid.startPos) GUI.backgroundColor = Color.magenta;
+                if (new Vector2Int(x, y) == grid.endPos) GUI.backgroundColor = Color.cyan;
+                if (grid.endOfIntersections.Any(endOfIntersection => endOfIntersection.position == new Vector2Int(x, y))) GUI.backgroundColor = Color.white;
                 if (GUILayout.Button(grid.GetValue(x, y).ToString()[0].ToString(), GUILayout.Width(24), GUILayout.Height(24)))
                 {
                     if (Event.current.button == 1)

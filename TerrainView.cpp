@@ -161,7 +161,7 @@ void TerrainView::drawTerrain(sf::RenderWindow& window)
 
 void TerrainView::drawCastle(sf::RenderWindow& window)
 {
-	// window.draw(*m_castleSprite->getSprite());
+	window.draw(*m_castleSprite->getSprite());
 }
 
 void TerrainView::drawDebugPath(sf::RenderWindow& window, Path* path)

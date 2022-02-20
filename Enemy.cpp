@@ -10,6 +10,7 @@
 #include "Time.h"
 #include "InputManager.h"
 #include "Random.h"
+#include "HealthBar.h"
 
 extern int CELL_WIDTH;
 extern int CELL_HEIGTH;
@@ -21,8 +22,8 @@ Enemy::Enemy(const int& health, const float& speed, EntitySprites* entitySprites
 	m_health(health),
 	m_speed(speed),
 	m_path(Terrain::terrain->getPath()),
-	m_posOffset(Vector2(Random::random(-2, 3), Random::random(-12, 12))),
-	m_sizeOffset(SCALE_FACTOR - 1)
+	m_posOffset(Vector2(Random::random(-4, 5), Random::random(-8, 9))),
+	m_sizeOffset(SCALE_FACTOR - .8)
 {
 	localTransform.setSize(Vector2i(CELL_WIDTH, CELL_HEIGTH));
 	setPosition(Terrain::getWorldPositionDirection(m_path->getPosition(), m_path->getOldDirection()) + m_posOffset);
@@ -30,6 +31,8 @@ Enemy::Enemy(const int& health, const float& speed, EntitySprites* entitySprites
 
 	setSprites(entitySprites);
 	setNextPosition();
+
+	addChildren(new HealthBar());
 }
 Enemy::~Enemy()
 {
@@ -40,7 +43,7 @@ Enemy::~Enemy()
 
 void Enemy::update()
 {
-	setZOrder((int)localTransform.position.Y * WINDOW_WIDTH - (int)localTransform.position.X);
+	setZOrder((localTransform.position.Y * WINDOW_WIDTH + localTransform.position.X) / (float)(WINDOW_WIDTH * WINDOW_HEIGHT));
 	followPath();
 }
 void Enemy::destroy()

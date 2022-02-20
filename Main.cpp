@@ -51,7 +51,7 @@ int main()
 	window.setFramerateLimit(120);
 	sf::Clock clock;
 
-	tick.onMiniEvent += EventHandler::bind([](){ new Enemy(100, Random::random(50, 1000), &ResourceManager::orcSprites[Random::random(0, 9)]); });
+	tick.onMiniEvent += EventHandler::bind([](){ new Enemy(100, 50, &ResourceManager::orcSprites[Random::random(0, 9)]); });
 
 	// Game loop
     while (window.isOpen())

@@ -83,7 +83,7 @@ void Transform::rotate(const float& rotation)
 Transform Transform::compose(Transform transform1, Transform transform2)
 {
 	Transform transform = Transform();
-	transform.position = (transform1.position * transform1.scale) + (transform2.position * transform2.scale);
+	transform.position = transform1.position + transform2.position;
 	transform.size = transform2.size;
 	transform.scale = transform2.scale;
 	transform.rotation = transform1.rotation + transform2.rotation;

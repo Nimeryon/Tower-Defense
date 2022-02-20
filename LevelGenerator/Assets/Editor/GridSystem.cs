@@ -26,7 +26,7 @@ public class GridSystem : MonoBehaviour
 
     public static GridSystem LoadFromFile(string levelName)
     {
-        string levelFilePath = Application.streamingAssetsPath + "/Levels/" + levelName + ".txt";
+        string levelFilePath = "../Assets/Terrains/" + levelName + ".txt";
         string[] lines = File.ReadAllLines(levelFilePath);
 
         GridSystem grid = new();
@@ -67,14 +67,6 @@ public class GridSystem : MonoBehaviour
         if (!IsBounded(x, y)) return;
         SetValue(GetValue(x, y).Prior(), x, y);
     }
-    public void SetRow(TerrainType value, int y)
-    {
-        if (!IsBounded(0, y)) return;
-        for (int x = 0; x < Width; x++)
-        {
-            SetValue(value, x, y);
-        }
-    }
     public void SetRowNext(int y)
     {
         if (!IsBounded(0, y)) return;
@@ -89,14 +81,6 @@ public class GridSystem : MonoBehaviour
         for (int x = 0; x < Width; x++)
         {
             SetPriorValue(x, y);
-        }
-    }
-    public void SetCol(TerrainType value, int x)
-    {
-        if (!IsBounded(x, 0)) return;
-        for (int y = 0; y < Height; y++)
-        {
-            SetValue(value, x, y);
         }
     }
     public void SetColNext(int x)
@@ -203,17 +187,14 @@ public class GridSystem : MonoBehaviour
     }
     public async void SaveToFile(string levelName, Vector2Int startPos, Direction startDirection, Vector2Int endPos, List<EndOfIntersection> endOfIntersections)
     {
-        if (!Directory.Exists(Application.streamingAssetsPath + "/Levels")) Directory.CreateDirectory(Application.streamingAssetsPath + "/Levels");
-        string levelFilePath = Application.streamingAssetsPath + "/Levels/" + levelName + ".txt";
+        if (!Directory.Exists("../Assets/Terrains")) Directory.CreateDirectory("../Assets/Terrains");
+        string levelFilePath = "../Assets/Terrains/" + levelName + ".txt";
         List<string> lines = new List<string>();
         for (int y = 0; y < Height; y++)
         {
             string line = "";
             for (int x = 0; x < Width; x++)
-            {
-                if (x != 0) line += ",";
                 line += GetValue(x, y).ToString()[0];
-            }
             lines.Add(line);
         }
         lines.Add(startPos.x + "," + startPos.y + "," + startDirection);

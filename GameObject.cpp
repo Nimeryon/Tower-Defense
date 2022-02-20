@@ -25,10 +25,6 @@ GameObject::~GameObject()
 
 	EngineHandler::onDebugDraw -= EventHandler::bind<sf::RenderWindow&, GameObject>(&GameObject::debugDrawCall, this);
 
-	for (GameObject* object : childrens)
-		object->destroy();
-	childrens.clear();
-
 	removeFromParent();
 }
 
@@ -36,7 +32,13 @@ void GameObject::awake() {}
 void GameObject::earlyUpdate() {}
 void GameObject::update() {}
 void GameObject::lateUpdate() {}
-void GameObject::destroy() { EngineHandler::destroyObject(this); }
+void GameObject::destroy()
+{
+	for (GameObject* object : childrens)
+		object->destroy();
+	childrens.clear();
+	EngineHandler::destroyObject(this);
+}
 
 void GameObject::drawCall(sf::RenderWindow& window) {}
 void GameObject::debugDrawCall(sf::RenderWindow& window) {}
@@ -51,7 +53,7 @@ void GameObject::addChildren(GameObject* object)
 	if (object->parent == this) return;
 	childrens.push_back(object);
 
-	object->setParent(this);
+	object->parent = this;
 	object->needUpdate();
 }
 void GameObject::removeChildren(GameObject* object)
@@ -67,18 +69,17 @@ void GameObject::removeFromParent()
 	if (parent == nullptr) return;
 	parent->removeChildren(this);
 }
-void GameObject::setParent(GameObject* newParent)
-{
-	if (parent == newParent) return;;
-	if (parent != nullptr) removeFromParent();
-	newParent->addChildren(this);
-}
 
 void GameObject::needUpdate() { m_needUpdate = true; }
 void GameObject::setVisible(const bool& isVisible) { m_isVisible = isVisible; }
-void GameObject::setZOrder(const int& zOrder) { m_zOrder = zOrder; }
-int GameObject::getZOrder() const { return m_zOrder; }
+void GameObject::setZOrder(const float& zOrder) { m_zOrder = zOrder; }
+float GameObject::getZOrder() const { return m_zOrder; }
 
+void GameObject::setSize(const Vector2i& size)
+{
+	localTransform.setSize(size);
+	needUpdate();
+}
 void GameObject::setPosition(const Vector2& position)
 {
 	localTransform.setPosition(position);

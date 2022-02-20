@@ -92,8 +92,8 @@ public class LevelWindow : EditorWindow
     {
         GUILayout.BeginHorizontal();
         GUILayout.Label("End of intersections");
-        if (GUILayout.Button("+")) { endOfIntersections.Add(new EndOfIntersection()); }
-        if (GUILayout.Button("-")) { endOfIntersections.RemoveAt(endOfIntersections.Count - 1); } 
+        if (GUILayout.Button("+", GUILayout.Width(64))) { endOfIntersections.Add(new EndOfIntersection()); }
+        if (GUILayout.Button("-", GUILayout.Width(64))) { endOfIntersections.RemoveAt(endOfIntersections.Count - 1); }
         GUILayout.EndHorizontal();
 
         Separator();

@@ -33,15 +33,15 @@ struct Transform : ITransform
 
 	explicit Transform(
 		Vector2 position = Vector2::zero(),
-		Vector2i size = Vector2i::one(),
-		Vector2 scale = Vector2(CELL_WIDTH, CELL_HEIGTH),
+		Vector2i size = Vector2i(CELL_WIDTH, CELL_HEIGTH),
+		Vector2 scale = Vector2::one(),
 		float rotation = 0,
 		Vector2 origin = Vector2::zero()
 	);
 
 	void setTransformable(sf::Transformable* transformable);
 
-	void setSize(const Vector2i& size);
+	void setSize(const Vector2i& size) override;
 	void setPosition(const Vector2& position) override;
 	void move(const Vector2& position) override;
 	void setScale(const Vector2& scale) override;

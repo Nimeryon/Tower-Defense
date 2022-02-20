@@ -10,16 +10,20 @@
 #include "TerrainView.h"
 #include "Time.h"
 #include "Enemy.h"
+#include "FpsCounter.h"
 #include "TickSystem.h"
 #include "Random.h"
 
 // Global Variables
-int LEVEL_WIDTH = 24;
-int LEVEL_HEIGHT = 16;
+int LEVEL_WIDTH = 32;
+int LEVEL_HEIGHT = 20;
 int CELL_WIDTH = 16;
 int CELL_HEIGTH = 16;
 float SCALE_FACTOR = 3.f;
 bool DEBUG_MODE = false;
+
+int WINDOW_WIDTH = LEVEL_WIDTH * CELL_WIDTH * SCALE_FACTOR;
+int WINDOW_HEIGHT = LEVEL_HEIGHT * CELL_HEIGTH * SCALE_FACTOR;
 
 std::string terrainEasyFilepath = "./Assets/Terrains/easy.txt";
 std::string terrainNormalFilepath = "./Assets/Terrains/normal.txt";
@@ -39,15 +43,15 @@ int main()
     Terrain* terrain = createTerrainFromFile(terrainEasyFilepath);
     TerrainView terrainView = TerrainView();
 
+	// Initialize fpsCounter
+	FpsCounter fpsCounter;
+
 	// Initialize window and clock
-	sf::RenderWindow window(sf::VideoMode(LEVEL_WIDTH * CELL_WIDTH * SCALE_FACTOR, LEVEL_HEIGHT * CELL_HEIGTH * SCALE_FACTOR), "Tower Defense");
+	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Tower Defense");
+	window.setFramerateLimit(120);
 	sf::Clock clock;
 
-	// Test ennemy
-	tick.onLittleEvent += EventHandler::bind([]()
-	{
-		new Enemy(100, 100, &ResourceManager::orcSprites[Random::random(0, 9)]);
-	});
+	tick.onMiniEvent += EventHandler::bind([](){ new Enemy(100, Random::random(50, 1000), &ResourceManager::orcSprites[Random::random(0, 9)]); });
 
 	// Game loop
     while (window.isOpen())
@@ -94,7 +98,7 @@ int main()
         window.clear();
 
         terrainView.drawTerrain(window);
-		EngineHandler::draw(&window);
+		EngineHandler::draw(window);
 		terrainView.drawCastle(window);
 
         window.display();

@@ -2,8 +2,11 @@
 #include "EngineHandler.h"
 #include "Timer.h"
 
+TickSystem* TickSystem::system = nullptr;
+
 TickSystem::TickSystem() : m_timer(new Timer(.1f)), m_tick(0)
 {
+    system = this;
     EngineHandler::onEarlyUpdate += EventHandler::bind(&TickSystem::update, this);
 }
 TickSystem::~TickSystem()
@@ -24,3 +27,4 @@ void TickSystem::update()
         if (m_tick % 50 == 0) onLongEvent();
     }
 }
+int TickSystem::getTick() const { return m_tick; }

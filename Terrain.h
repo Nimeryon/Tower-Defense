@@ -1,7 +1,7 @@
 #pragma once
 class Path;
 class TerrainTile;
-enum TerrainTileType;
+enum class TerrainTileType;
 
 #include <vector>
 
@@ -37,7 +37,7 @@ public:
 private:
 
 	std::vector<TerrainTile> m_terrain;
-	Path* m_path;
+	Path* m_path = nullptr;
 };
 
 Terrain* createTerrainFromFile(const std::string& filepath);

@@ -1,4 +1,7 @@
 #include "Path.h"
+
+#include <iostream>
+
 #include "Direction.h"
 #include "Random.h"
 #include "Terrain.h"
@@ -11,40 +14,33 @@ Path::~Path()
 {
 	delete m_pathNorth;
 	delete m_pathSouth;
-	delete m_pathEast;
 	delete m_pathWest;
+	delete m_pathEast;
 }
 
 Vector2i Path::getPosition() { return m_position; }
+Vector2i Path::getOldPosition()
+{
+	return m_position + Direction::getVector2i(m_oldDirection);
+}
 
 void Path::addDirection(const DirectionType& type, Path* path)
 {
 	switch (type)
 	{
-		case NORTH:
+		case DirectionType::NORTH:
 			m_pathNorth = path;
 			break;
-		case SOUTH:
+		case DirectionType::SOUTH:
 			m_pathSouth = path;
 			break;
-		case EAST:
-			m_pathEast = path;
-			break;
-		case WEST:
+		case DirectionType::WEST:
 			m_pathWest = path;
 			break;
+		case DirectionType::EAST:
+			m_pathEast = path;
+			break;
 	}
-}
-
-bool Path::isPositionInPath(Path* path, Vector2i pos)
-{
-	if (path == nullptr) return false;
-	if (path->getPosition() == pos) return true;
-
-	if (path->getPath(NORTH) != nullptr && isPositionInPath(path->getPath(NORTH), pos)) return true;
-	if (path->getPath(SOUTH) != nullptr && isPositionInPath(path->getPath(SOUTH), pos)) return true;
-	if (path->getPath(EAST) != nullptr && isPositionInPath(path->getPath(EAST), pos)) return true;
-	if (path->getPath(WEST) != nullptr) return isPositionInPath(path->getPath(WEST), pos);
 }
 
 Path* Path::getNextPath()
@@ -52,9 +48,9 @@ Path* Path::getNextPath()
 	std::vector<Path*> paths = {};
 	if (m_pathNorth != nullptr) paths.push_back(m_pathNorth);
 	if (m_pathSouth != nullptr) paths.push_back(m_pathSouth);
-	if (m_pathEast != nullptr) paths.push_back(m_pathEast);
 	if (m_pathWest != nullptr) paths.push_back(m_pathWest);
-
+	if (m_pathEast != nullptr) paths.push_back(m_pathEast);
+	
 	if (paths.size() == 1) return paths[0];
 	return paths[Random::random(0, paths.size())];
 }
@@ -63,15 +59,17 @@ Path* Path::getPath(const DirectionType& type)
 {
 	switch (type)
 	{
-		case NORTH:
+		case DirectionType::NORTH:
 			return m_pathNorth;
-		case SOUTH:
+		case DirectionType::SOUTH:
 			return m_pathSouth;
-		case EAST:
-			return m_pathEast;
-		case WEST:
+		case DirectionType::WEST:
 			return m_pathWest;
+		case DirectionType::EAST:
+			return m_pathEast;
 	}
+
+	return this;
 }
 
 DirectionType Path::getOldDirection() { return m_oldDirection; }
@@ -80,13 +78,13 @@ int Path::getAdjacentPathCount() const
 {
 	int pathCount = 0;
 	if (m_pathNorth != nullptr) pathCount++;
-	if (m_pathNorth != nullptr) pathCount++;
-	if (m_pathNorth != nullptr) pathCount++;
-	if (m_pathNorth != nullptr) pathCount++;
+	if (m_pathSouth != nullptr) pathCount++;
+	if (m_pathWest != nullptr) pathCount++;
+	if (m_pathEast != nullptr) pathCount++;
 	return pathCount;
 }
 
-Path* Path::generatePath(Path* path, std::vector<EndOfIntersection> endOfIntersections)
+Path* Path::generatePath(Path* path, const std::vector<EndOfIntersection>& endOfIntersections)
 {
 	for (EndOfIntersection endOfIntersection : endOfIntersections)
 	{
@@ -94,7 +92,7 @@ Path* Path::generatePath(Path* path, std::vector<EndOfIntersection> endOfInterse
 		{
 			path->addDirection(endOfIntersection.m_direction,
 				generatePath(
-					new Path(path->getPosition() + Direction::getVector2i(endOfIntersection.m_direction), Direction::getOpposite(path->getOldDirection())),
+					new Path(path->getPosition() + Direction::getVector2i(endOfIntersection.m_direction), Direction::getOpposite(endOfIntersection.m_direction)),
 					endOfIntersections
 				)
 			);
@@ -102,21 +100,21 @@ Path* Path::generatePath(Path* path, std::vector<EndOfIntersection> endOfInterse
 		}
 	}
 
-	Vector2i northPos = path->getPosition() + Direction::getVector2i(NORTH);
-	if (path->getOldDirection() != NORTH && Terrain::terrain->getTile(northPos).getType() == DIRT)
-		path->addDirection(NORTH, generatePath(new Path(northPos, SOUTH), endOfIntersections));
+	Vector2i northPos = path->getPosition() + Direction::getVector2i(DirectionType::NORTH);
+	if (path->getOldDirection() != DirectionType::NORTH && Terrain::terrain->getTile(northPos).getType() == TerrainTileType::DIRT)
+		path->addDirection(DirectionType::NORTH, generatePath(new Path(northPos, DirectionType::SOUTH), endOfIntersections));
 
-	Vector2i southPos = path->getPosition() + Direction::getVector2i(SOUTH);
-	if (path->getOldDirection() != SOUTH && Terrain::terrain->getTile(southPos).getType() == DIRT)
-		path->addDirection(SOUTH, generatePath(new Path(southPos, NORTH), endOfIntersections));
+	Vector2i southPos = path->getPosition() + Direction::getVector2i(DirectionType::SOUTH);
+	if (path->getOldDirection() != DirectionType::SOUTH && Terrain::terrain->getTile(southPos).getType() == TerrainTileType::DIRT)
+		path->addDirection(DirectionType::SOUTH, generatePath(new Path(southPos, DirectionType::NORTH), endOfIntersections));
 
-	Vector2i eastPos = path->getPosition() + Direction::getVector2i(EAST);
-	if (path->getOldDirection() != EAST && Terrain::terrain->getTile(eastPos).getType() == DIRT)
-		path->addDirection(EAST, generatePath(new Path(eastPos, WEST), endOfIntersections));
+	Vector2i westPos = path->getPosition() + Direction::getVector2i(DirectionType::WEST);
+	if (path->getOldDirection() != DirectionType::WEST && Terrain::terrain->getTile(westPos).getType() == TerrainTileType::DIRT)
+		path->addDirection(DirectionType::WEST, generatePath(new Path(westPos, DirectionType::EAST), endOfIntersections));
 
-	Vector2i westPos = path->getPosition() + Direction::getVector2i(WEST);
-	if (path->getOldDirection() != WEST && Terrain::terrain->getTile(westPos).getType() == DIRT)
-		path->addDirection(WEST, generatePath(new Path(westPos, EAST), endOfIntersections));
+	Vector2i eastPos = path->getPosition() + Direction::getVector2i(DirectionType::EAST);
+	if (path->getOldDirection() != DirectionType::EAST && Terrain::terrain->getTile(eastPos).getType() == TerrainTileType::DIRT)
+		path->addDirection(DirectionType::EAST, generatePath(new Path(eastPos, DirectionType::WEST), endOfIntersections));
 
 	return path;
 }

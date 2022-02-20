@@ -59,15 +59,16 @@ Vector2 Terrain::getWorldPositionDirection(const Vector2i& terrainPos, const Dir
 {
 	switch (directionType)
 	{
-		case NORTH:
+		case DirectionType::NORTH:
 			return getWorldPositionCenter(terrainPos) - Vector2(0, CELL_HEIGTH * SCALE_FACTOR / 2.f);
-		case SOUTH:
+		case DirectionType::SOUTH:
 			return getWorldPositionCenter(terrainPos) + Vector2(0, CELL_HEIGTH * SCALE_FACTOR / 2.f);
-		case EAST:
+		case DirectionType::WEST:
 			return getWorldPositionCenter(terrainPos) - Vector2(CELL_WIDTH * SCALE_FACTOR / 2.f, 0);
-		case WEST:
+		case DirectionType::EAST:
 			return getWorldPositionCenter(terrainPos) + Vector2(CELL_WIDTH * SCALE_FACTOR / 2.f, 0);
 	}
+	return Vector2::zero();
 }
 Vector2 Terrain::getWorldPositionDirection(const int& x, const int& y, const DirectionType& directionType)
 {
@@ -101,9 +102,9 @@ Terrain* createTerrainFromFile(const std::string& filepath)
 			Vector2i pos = Vector2i(x, y);
 			
 			if (character == 'G') terrain->getTile(pos) = TerrainTile();
-			else if (character == 'D') terrain->getTile(pos) = TerrainTile(DIRT);
-			else if (character == 'S') terrain->getTile(pos) = TerrainTile(SAND);
-			else if (character == 'W') terrain->getTile(pos) = TerrainTile(WATER);
+			else if (character == 'D') terrain->getTile(pos) = TerrainTile(TerrainTileType::DIRT);
+			else if (character == 'S') terrain->getTile(pos) = TerrainTile(TerrainTileType::SAND);
+			else if (character == 'W') terrain->getTile(pos) = TerrainTile(TerrainTileType::WATER);
 		}
 	}
 

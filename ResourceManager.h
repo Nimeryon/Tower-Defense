@@ -1,10 +1,14 @@
 #pragma once
+#include <vector>
+
 namespace sf
 {
+	class Sprite;
 	class Texture;
+	class Font;
 }
 class Terrain;
-enum TerrainTileType;
+enum class TerrainTileType;
 
 #include "Vector2i.h"
 
@@ -48,6 +52,8 @@ public:
 	static std::vector<EntitySprites> orcSprites;
 
 	static sf::Sprite castleSprite;
+
+	static sf::Font m_font;
 
 private:
 	static sf::Texture m_terrainTexture;

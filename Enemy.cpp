@@ -6,20 +6,27 @@
 #include "Sprite.h"
 #include "Terrain.h"
 #include "Direction.h"
-#include "EngineHandler.h"
 #include "ResourceManager.h"
 #include "Time.h"
+#include "InputManager.h"
+#include "Random.h"
 
 extern int CELL_WIDTH;
 extern int CELL_HEIGTH;
 extern float SCALE_FACTOR;
+extern int WINDOW_HEIGHT;
+extern int WINDOW_WIDTH;
 
 Enemy::Enemy(const int& health, const float& speed, EntitySprites* entitySprites) :
 	m_health(health),
 	m_speed(speed),
-	m_path(Terrain::terrain->getPath())
+	m_path(Terrain::terrain->getPath()),
+	m_posOffset(Vector2(Random::random(-2, 3), Random::random(-12, 12))),
+	m_sizeOffset(SCALE_FACTOR - 1)
 {
-	m_position = Terrain::getWorldPositionDirection(m_path->getPosition(), m_path->getOldDirection());
+	localTransform.setSize(Vector2i(CELL_WIDTH, CELL_HEIGTH));
+	setPosition(Terrain::getWorldPositionDirection(m_path->getPosition(), m_path->getOldDirection()) + m_posOffset);
+	setOriginAligned(Alignment::BOTTOMCENTER);
 
 	setSprites(entitySprites);
 	setNextPosition();
@@ -33,12 +40,18 @@ Enemy::~Enemy()
 
 void Enemy::update()
 {
-	setZOrder((int)m_position.Y);
+	setZOrder((int)localTransform.position.Y * WINDOW_WIDTH - (int)localTransform.position.X);
 	followPath();
 }
 void Enemy::destroy()
 {
-	EngineHandler::destroyObject(this);
+	GameObject::destroy();
+}
+
+void Enemy::drawCall(sf::RenderWindow& window)
+{
+	transform.setTransformable(m_currentSide->getSprite());
+	window.draw(*m_currentSide->getSprite());
 }
 
 void Enemy::setSprites(EntitySprites* entitySprites)
@@ -47,28 +60,34 @@ void Enemy::setSprites(EntitySprites* entitySprites)
 	m_animationNorth->addFrame(&entitySprites->spritesNorth[1]);
 	m_animationNorth->addFrame(&entitySprites->spritesNorth[0]);
 	m_animationNorth->addFrame(&entitySprites->spritesNorth[2]);
-	m_animationNorth->setOrigin(Vector2(CELL_WIDTH / 2.f, CELL_HEIGTH));
 
 	m_animationSouth = new AnimatedSprite(&entitySprites->spritesSouth[0], 16.f / m_speed);
 	m_animationSouth->addFrame(&entitySprites->spritesSouth[1]);
 	m_animationSouth->addFrame(&entitySprites->spritesSouth[0]);
 	m_animationSouth->addFrame(&entitySprites->spritesSouth[2]);
-	m_animationSouth->setOrigin(Vector2(CELL_WIDTH / 2.f, CELL_HEIGTH));
 
 	m_animationSide = new AnimatedSprite(&entitySprites->spritesSide[0], 16.f / m_speed);
 	m_animationSide->addFrame(&entitySprites->spritesSide[1]);
 	m_animationSide->addFrame(&entitySprites->spritesSide[0]);
 	m_animationSide->addFrame(&entitySprites->spritesSide[2]);
-	m_animationSide->setOrigin(Vector2(CELL_WIDTH / 2.f, CELL_HEIGTH));
 }
 void Enemy::setNextPosition()
 {
+
+	bool canCheckPath = true;
 	m_nextDirection = Direction::getOpposite(m_path->getNextPath()->getOldDirection());
-	while (m_path->getPath(m_nextDirection) != nullptr)
+	while (canCheckPath)
 	{
-		m_path = m_path->getNextPath();
+		Path* path = m_path->getPath(m_nextDirection);
+		if (path == nullptr) canCheckPath = false;
+		else if (path->getAdjacentPathCount() == 1) m_path = path;
+		else
+		{
+			m_path = path;
+			canCheckPath = false;
+		}
 	}
-	m_nextPosition = Terrain::getWorldPositionCenter(m_path->getPosition());
+	m_nextPosition = Terrain::getWorldPositionCenter(m_path->getPosition()) + m_posOffset;
 
 	setAnimation();
 }
@@ -76,37 +95,34 @@ void Enemy::setAnimation()
 {
 	switch (m_nextDirection)
 	{
-		case NORTH:
+		case DirectionType::NORTH:
+			setScale(Vector2(m_sizeOffset, m_sizeOffset));
 			m_currentSide = m_animationNorth;
 			break;
-		case SOUTH:
+		case DirectionType::SOUTH:
+			setScale(Vector2(m_sizeOffset, m_sizeOffset));
 			m_currentSide = m_animationSouth;
 			break;
-		case EAST:
+		case DirectionType::WEST:
+			setScale(Vector2(-m_sizeOffset, m_sizeOffset));
 			m_currentSide = m_animationSide;
 			break;
-		case WEST:
+		case DirectionType::EAST:
+			setScale(Vector2(m_sizeOffset, m_sizeOffset));
 			m_currentSide = m_animationSide;
 			break;
 	}
 }
 
-sf::Drawable* Enemy::getDrawable()
-{
-	m_currentSide->setPosition(m_position);
-	m_currentSide->setScale(m_nextDirection == EAST ? Vector2(-SCALE_FACTOR, SCALE_FACTOR) : Vector2(SCALE_FACTOR, SCALE_FACTOR));
-	return m_currentSide->getSprite();
-}
-
 void Enemy::followPath()
 {
-	m_position += Direction::getVector2(m_nextDirection) * m_speed * Time::deltaTime;
-	if ((m_nextDirection == NORTH && m_position.Y <= m_nextPosition.Y) ||
-		(m_nextDirection == SOUTH && m_position.Y >= m_nextPosition.Y) ||
-		(m_nextDirection == EAST && m_position.X <= m_nextPosition.X) ||
-		(m_nextDirection == WEST && m_position.X >= m_nextPosition.X)) 
+	move(Direction::getVector2(m_nextDirection) * m_speed * Time::deltaTime);
+	if ((m_nextDirection == DirectionType::NORTH && localTransform.position.Y <= m_nextPosition.Y) ||
+		(m_nextDirection == DirectionType::SOUTH && localTransform.position.Y >= m_nextPosition.Y) ||
+		(m_nextDirection == DirectionType::WEST && localTransform.position.X <= m_nextPosition.X) ||
+		(m_nextDirection == DirectionType::EAST && localTransform.position.X >= m_nextPosition.X))
 	{
-		m_position = m_nextPosition;
+		setPosition(m_nextPosition);
 		if (m_path->getPosition() == Terrain::terrain->castlePosition)
 			return destroy();
 

@@ -1,8 +1,10 @@
 #pragma once
+#include <vector>
+
 #include "Vector2i.h"
 
 struct EndOfIntersection;
-enum DirectionType;
+enum class DirectionType;
 
 struct EndOfIntersection
 {
@@ -19,6 +21,7 @@ public:
 	~Path();
 
 	Vector2i getPosition();
+	Vector2i getOldPosition();
 
 	void addDirection(const DirectionType& type, Path* pos);
 	Path* getNextPath();
@@ -26,8 +29,7 @@ public:
 	DirectionType getOldDirection();
 	int getAdjacentPathCount() const;
 	
-	static bool isPositionInPath(Path* path, Vector2i pos);
-	static Path* generatePath(Path* path, std::vector<EndOfIntersection> endOfIntersections);
+	static Path* generatePath(Path* path, const std::vector<EndOfIntersection>& endOfIntersections);
 
 private:
 	Vector2i m_position;
@@ -35,6 +37,6 @@ private:
 
 	Path* m_pathNorth = nullptr;
 	Path* m_pathSouth = nullptr;
-	Path* m_pathEast = nullptr;
 	Path* m_pathWest = nullptr;
+	Path* m_pathEast = nullptr;
 };

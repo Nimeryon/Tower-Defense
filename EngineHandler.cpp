@@ -12,10 +12,14 @@ Event<void> EngineHandler::onUpdate = Event<void>();
 Event<void> EngineHandler::onLateUpdate = Event<void>();
 Event<void> EngineHandler::onEventTimerExecution = Event<void>();
 
+Event<sf::RenderWindow&> EngineHandler::onDebugDraw = Event<sf::RenderWindow&>();
+
 // GameObjects vector
 std::vector<GameObject*> EngineHandler::m_objects = {};
 std::vector<GameObject*> EngineHandler::m_objectsToDestroy = {};
 std::vector<GameObject*> EngineHandler::m_objectsToDraw = {};
+
+extern bool DEBUG_MODE;
 
 void EngineHandler::update()
 {
@@ -42,16 +46,16 @@ void EngineHandler::drawObject(GameObject* object)
 {
 	m_objectsToDraw.push_back(object);
 }
-void EngineHandler::draw(sf::RenderWindow* window)
+void EngineHandler::draw(sf::RenderWindow& window)
 {
-	std::cout << m_objectsToDraw.size() << std::endl;
 	std::sort(m_objectsToDraw.begin(), m_objectsToDraw.end(), [](GameObject* object1, GameObject* object2)
 		{ return object1->getZOrder() < object2->getZOrder(); });
 
 	for (GameObject* object : m_objectsToDraw)
-		window->draw(*object->getDrawable());
+		object->drawCall(window);
+	m_objectsToDraw.clear();
 
-	m_objectsToDraw.resize(0);
+	if (DEBUG_MODE) onDebugDraw(window);
 }
 
 void EngineHandler::clearObjectsToDestroy()

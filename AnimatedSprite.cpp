@@ -1,3 +1,5 @@
+#include <SFML/Graphics.hpp>
+
 #include "EngineHandler.h"
 #include "Event.h"
 #include "AnimatedSprite.h"

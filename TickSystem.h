@@ -9,6 +9,7 @@ public:
 	~TickSystem();
 
 	void update();
+	int getTick() const;
 
 	/* Occurs every #TICK_TIME per seconds ( 10 / seconds ) */ Event<void> onMiniEvent;
 	/* Occurs every #TICK_TIME % 2 per seconds ( 5 / seconds) */ Event<void> onSmallEvent;

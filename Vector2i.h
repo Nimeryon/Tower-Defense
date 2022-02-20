@@ -1,5 +1,5 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include "Vector2.h"
 
 struct Vector2i
 {
@@ -18,28 +18,9 @@ struct Vector2i
 	static Vector2i down() { return Vector2i(0, 1); }
 
 	// Static methods
-	static int magnitude(const Vector2i& v)
-	{
-		return sqrtf((v.X * v.X) + (v.Y * v.Y));
-	}
-	static int distance(const Vector2i& v1, const Vector2i& v2)
-	{
-		int x = v2.X - v1.X;
-		int y = v2.Y - v1.Y;
-
-		return magnitude(Vector2i(x, y));
-	}
 	static int determinant(const Vector2i& v1, const Vector2i& v2)
 	{
 		return v1.X * v2.Y - v2.X * v1.Y;
-	}
-	static Vector2i normalize(const Vector2i& v)
-	{
-		int magn = magnitude(v);
-		return Vector2i(
-			v.X / magn,
-			v.Y / magn
-		);
 	}
 
 	// Methods
@@ -55,26 +36,17 @@ struct Vector2i
 	{
 		*this *= f;
 	}
-	int magnitude() const
-	{
-		return magnitude(*this);
-	}
+
 	int determinant(const Vector2i& v) const
 	{
 		return determinant(*this, v);
-	}
-	int distance(const Vector2i& v) const
-	{
-		return distance(*this, v);
-	}
-	Vector2i normalized() const
-	{
-		return normalize(*this);
 	}
 
 	// Operator when used with SFML
 	static Vector2i from(sf::Vector2f vector) { return Vector2i((int)vector.x, (int)vector.y); }
 	static Vector2i from(sf::Vector2i vector) { return Vector2i(vector.x, vector.y); }
+	static Vector2i from(Vector2 vector) { return Vector2i((int)vector.X, (int)vector.Y); }
+	Vector2 toFloat() { return Vector2((int)X, (int)Y); }
 	operator sf::Vector2f() const { return { (float)X, (float)Y }; }
 	operator sf::Vector2i() const { return { X, Y }; }
 

@@ -1,3 +1,5 @@
+#include <SFML/Graphics.hpp>
+
 #include "ResourceManager.h"
 #include "Random.h"
 #include "Terrain.h"
@@ -10,6 +12,8 @@ sf::Texture ResourceManager::m_waterBorderTexture = sf::Texture();
 sf::Texture ResourceManager::m_monsterTexture = sf::Texture();
 sf::Texture ResourceManager::m_towerTexture = sf::Texture();
 sf::Texture ResourceManager::m_startPathTexture = sf::Texture();
+
+sf::Font ResourceManager::m_font = sf::Font();
 
 std::vector<sf::Sprite> ResourceManager::grassSprites = {};
 std::vector<sf::Sprite> ResourceManager::grass_border_sprites = {};
@@ -34,6 +38,8 @@ AnimationSprite::AnimationSprite(std::vector<sf::Sprite> sprites) : sprites(spri
 
 bool ResourceManager::load()
 {
+	if (!m_font.loadFromFile("./Assets/Fonts/PublicPixel.ttf")) return false;
+
 	if (!m_terrainTexture.loadFromFile("./Assets/Sprites/terrain_tileset.png")) return false;
 	if (!m_waterBorderTexture.loadFromFile("./Assets/Sprites/water_border_tileset.png")) return false;
 	if (!m_monsterTexture.loadFromFile("./Assets/Sprites/monster_tileset.png")) return false;

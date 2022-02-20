@@ -151,7 +151,9 @@
     <ClInclude Include="EngineHandler.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="FpsCounter.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="HealthBar.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="ITransform.h" />
     <ClInclude Include="Math.h" />
@@ -166,6 +168,7 @@
     <ClInclude Include="TickSystem.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="Vector2i.h" />
   </ItemGroup>
@@ -174,6 +177,7 @@
     <ClCompile Include="Direction.cpp" />
     <ClCompile Include="EngineHandler.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="FpsCounter.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -189,6 +193,7 @@
     <ClCompile Include="TickSystem.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Assets\Terrains\easy.txt" />

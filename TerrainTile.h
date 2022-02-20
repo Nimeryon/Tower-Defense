@@ -1,5 +1,5 @@
 #pragma once
-enum TerrainTileType
+enum class TerrainTileType
 {
 	GRASS,
 	DIRT,
@@ -10,7 +10,7 @@ enum TerrainTileType
 class TerrainTile
 {
 public:
-	explicit TerrainTile(TerrainTileType type = GRASS);
+	explicit TerrainTile(TerrainTileType type = TerrainTileType::GRASS);
 
 	TerrainTileType getType() const;
 

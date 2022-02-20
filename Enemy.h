@@ -3,6 +3,10 @@
 #include "GameObject.h"
 #include "Vector2.h"
 
+namespace sf
+{
+	class RectangleShape;
+}
 struct EntitySprites;
 class Path;
 class Sprite;
@@ -17,21 +21,23 @@ public:
 	void update() override;
 	void destroy() override;
 
+	void drawCall(sf::RenderWindow& window) override;
+
 	void followPath();
 	void setAnimation();
 	void setSprites(EntitySprites* entitySprites);
 	void setNextPosition();
-
-	sf::Drawable* getDrawable() override;
 
 private:
 	int m_health;
 	float m_speed;
 
 	Path* m_path;
-	DirectionType m_nextDirection = NORTH;
+	DirectionType m_nextDirection = DirectionType::NORTH;
 	Vector2 m_nextPosition = Vector2::zero();
-	Vector2 m_position = Vector2::zero();
+	
+	Vector2 m_posOffset;
+	float m_sizeOffset;
 	
 	AnimatedSprite* m_animationNorth = nullptr;
 	AnimatedSprite* m_animationSouth = nullptr;

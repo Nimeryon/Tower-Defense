@@ -132,6 +132,15 @@
     <ClInclude Include="Cursor.h">
       <Filter>Header Files\Views</Filter>
     </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="FpsCounter.h">
+      <Filter>Header Files\Views</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthBar.h">
+      <Filter>Header Files\Engine\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -189,6 +198,12 @@
       <Filter>Source Files\Engine\Entities</Filter>
     </ClCompile>
     <ClCompile Include="TickSystem.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="FpsCounter.cpp">
       <Filter>Source Files\Views</Filter>
     </ClCompile>
   </ItemGroup>

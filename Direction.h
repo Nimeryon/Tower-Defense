@@ -5,12 +5,12 @@
 
 struct Vector2i;
 
-enum DirectionType
+enum class DirectionType
 {
 	NORTH,
-	EAST,
+	WEST,
 	SOUTH,
-	WEST
+	EAST
 };
 
 class Direction

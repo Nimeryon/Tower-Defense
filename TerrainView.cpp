@@ -20,16 +20,25 @@ extern int CELL_HEIGTH;
 extern float SCALE_FACTOR;
 extern bool DEBUG_MODE;
 
-TerrainView::TerrainView() : m_debugLine(sf::RectangleShape())
+TerrainView::TerrainView() : m_debugRectangle(new sf::RectangleShape()), m_debugPathCount(new sf::Text())
 {
 	m_sprites.resize(LEVEL_WIDTH * LEVEL_HEIGHT);
 	m_castleSprite = new Sprite(&ResourceManager::castleSprite);
 
 	// Setup debugLine
-	m_debugLine.setScale(Vector2i(SCALE_FACTOR));
-	m_debugLine.setFillColor(sf::Color(255, 0, 0, 128));
+	m_debugRectangle->setScale(Vector2i(SCALE_FACTOR));
+	m_debugRectangle->setFillColor(sf::Color(255, 0, 0, 128));
+
+	m_debugPathCount->setFont(ResourceManager::m_font);
+	m_debugPathCount->setCharacterSize(16);
+	m_debugPathCount->setOrigin(Vector2i(CELL_WIDTH / 2, CELL_HEIGTH / 2));
 
 	update();
+}
+TerrainView::~TerrainView()
+{
+	delete m_debugRectangle;
+	delete m_debugPathCount;
 }
 
 void TerrainView::update()
@@ -45,8 +54,8 @@ void TerrainView::update()
 			int tileIndex;
 			switch (type)
 			{
-				case GRASS:
-					tileIndex = calculateTerrainAutotilingIndex(type, pos, true, {DIRT, SAND});
+				case TerrainTileType::GRASS:
+					tileIndex = calculateTerrainAutotilingIndex(type, pos, true, {TerrainTileType::DIRT, TerrainTileType::SAND});
 					if (pos == Terrain::terrain->castlePosition
 						|| pos == Vector2i(Terrain::terrain->castlePosition.X - 1, Terrain::terrain->castlePosition.Y)
 						|| pos == Vector2i(Terrain::terrain->castlePosition.X + 1, Terrain::terrain->castlePosition.Y)
@@ -63,14 +72,14 @@ void TerrainView::update()
 					else m_sprites[Terrain::terrain->getArrayPos(pos)] = new Sprite(&ResourceManager::grass_border_sprites[tileIndex]);
 					break;
 
-				case DIRT:
+				case TerrainTileType::DIRT:
 					if (pos == Terrain::terrain->getPath()->getPosition())
 					{
 						int startPathIndex;
-						if (Terrain::terrain->getPath()->getOldDirection() == NORTH) startPathIndex = 1;
-						if (Terrain::terrain->getPath()->getOldDirection() == SOUTH) startPathIndex = 0;
-						if (Terrain::terrain->getPath()->getOldDirection() == EAST) startPathIndex = 2;
-						if (Terrain::terrain->getPath()->getOldDirection() == WEST) startPathIndex = 3;
+						if (Terrain::terrain->getPath()->getOldDirection() == DirectionType::NORTH) startPathIndex = 1;
+						if (Terrain::terrain->getPath()->getOldDirection() == DirectionType::SOUTH) startPathIndex = 0;
+						if (Terrain::terrain->getPath()->getOldDirection() == DirectionType::WEST) startPathIndex = 2;
+						if (Terrain::terrain->getPath()->getOldDirection() == DirectionType::EAST) startPathIndex = 3;
 
 						AnimatedSprite* animatedSprite = new AnimatedSprite(&ResourceManager::startPathSprites[startPathIndex].sprites[0], .15f);
 						animatedSprite->addFrame(&ResourceManager::startPathSprites[startPathIndex].sprites[1]);
@@ -93,8 +102,8 @@ void TerrainView::update()
 					}
 					break;
 
-				case SAND:
-					tileIndex = calculateTerrainAutotilingIndex(type, pos, true, { DIRT, GRASS });
+				case TerrainTileType::SAND:
+					tileIndex = calculateTerrainAutotilingIndex(type, pos, true, {TerrainTileType::DIRT, TerrainTileType::GRASS });
 					if (pos == Terrain::terrain->castlePosition
 						|| pos == Vector2i(Terrain::terrain->castlePosition.X - 1, Terrain::terrain->castlePosition.Y)
 						|| pos == Vector2i(Terrain::terrain->castlePosition.X + 1, Terrain::terrain->castlePosition.Y)
@@ -111,7 +120,7 @@ void TerrainView::update()
 					else m_sprites[Terrain::terrain->getArrayPos(pos)] = new Sprite(&ResourceManager::desertBorderSprites[tileIndex]);
 					break;
 					
-				case WATER:
+				case TerrainTileType::WATER:
 					tileIndex = calculateTerrainAutotilingIndex(type, pos, true, {});
 					if (tileIndex == 10)
 						m_sprites[Terrain::terrain->getArrayPos(pos)] = new Sprite(ResourceManager::getRandomSprite(ResourceManager::waterSprites, 8));
@@ -131,7 +140,7 @@ void TerrainView::update()
 	
 	m_castleSprite->setPosition(Terrain::getWorldPosition(Terrain::terrain->castlePosition));
 	m_castleSprite->setScale(Vector2(SCALE_FACTOR));
-	m_castleSprite->setOrigin(Vector2(CELL_WIDTH / 2.0f, CELL_HEIGTH));
+	m_castleSprite->setOrigin(Vector2(CELL_WIDTH / 2.0f, CELL_HEIGTH - 1));
 }
 void TerrainView::drawTerrain(sf::RenderWindow& window)
 {
@@ -146,102 +155,104 @@ void TerrainView::drawTerrain(sf::RenderWindow& window)
 			window.draw(*m_sprites[Terrain::terrain->getArrayPos(pos)]->getSprite());
 		}
 	}
-	window.draw(*m_castleSprite->getSprite());
 
 	if (DEBUG_MODE) drawDebugPath(window, Terrain::terrain->getPath());
 }
 
 void TerrainView::drawCastle(sf::RenderWindow& window)
 {
-	window.draw(*m_castleSprite->getSprite());
+	// window.draw(*m_castleSprite->getSprite());
 }
 
 void TerrainView::drawDebugPath(sf::RenderWindow& window, Path* path)
 {
 	// Draw cube in path center
-	m_debugLine.setFillColor(sf::Color(255, 0, 0, 255));
-	m_debugLine.setSize(Vector2i(4, 4));
-	m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
-	m_debugLine.setOrigin(Vector2i(2, 2));
+	m_debugRectangle->setFillColor(sf::Color(255, 0, 0, 255));
+	m_debugRectangle->setSize(Vector2i(4, 4));
+	m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
+	m_debugRectangle->setOrigin(Vector2i(2, 2));
+	window.draw(*m_debugRectangle);
 
-	window.draw(m_debugLine);
-	m_debugLine.setFillColor(sf::Color(255, 0, 0, 64));
-
-	if (path->getPath(NORTH) != nullptr)
+	m_debugRectangle->setFillColor(sf::Color(255, 0, 0, 64));
+	if (path->getPath(DirectionType::NORTH) != nullptr)
 	{
 		// Draw self path half line
-		m_debugLine.setSize(Vector2i(2 ,CELL_HEIGTH / 2 - 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
-		m_debugLine.setOrigin(Vector2i(1, CELL_HEIGTH / 2));
+		m_debugRectangle->setSize(Vector2i(2 ,CELL_HEIGTH / 2 - 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(1, CELL_HEIGTH / 2));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
 		// Draw next path line
-		m_debugLine.setSize(Vector2i(2, CELL_HEIGTH / 2 - 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPath(NORTH)->getPosition()));
-		m_debugLine.setOrigin(Vector2i(1, -2));
+		m_debugRectangle->setSize(Vector2i(2, CELL_HEIGTH / 2 - 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPath(DirectionType::NORTH)->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(1, -2));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
-		drawDebugPath(window, path->getPath(NORTH));
+		drawDebugPath(window, path->getPath(DirectionType::NORTH));
 	}
 
-	if (path->getPath(SOUTH) != nullptr)
+	if (path->getPath(DirectionType::SOUTH) != nullptr)
 	{
 		// Draw self path half line
-		m_debugLine.setSize(Vector2i(2, CELL_HEIGTH / 2 - 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
-		m_debugLine.setOrigin(Vector2i(1, -2));
+		m_debugRectangle->setSize(Vector2i(2, CELL_HEIGTH / 2 - 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(1, -2));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
 		// Draw next path line
-		m_debugLine.setSize(Vector2i(2, CELL_HEIGTH / 2 - 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPath(SOUTH)->getPosition()));
-		m_debugLine.setOrigin(Vector2i(1, CELL_HEIGTH / 2));
+		m_debugRectangle->setSize(Vector2i(2, CELL_HEIGTH / 2 - 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPath(DirectionType::SOUTH)->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(1, CELL_HEIGTH / 2));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
-		drawDebugPath(window, path->getPath(SOUTH));
+		drawDebugPath(window, path->getPath(DirectionType::SOUTH));
 	}
 
-	if (path->getPath(EAST) != nullptr)
+	if (path->getPath(DirectionType::WEST) != nullptr)
 	{
 		// Draw self path half line
-		m_debugLine.setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
-		m_debugLine.setOrigin(Vector2i(CELL_WIDTH / 2, 1));
+		m_debugRectangle->setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(CELL_WIDTH / 2, 1));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
 		// Draw next path line
-		m_debugLine.setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPath(EAST)->getPosition()));
-		m_debugLine.setOrigin(Vector2i(-2, 1));
+		m_debugRectangle->setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPath(DirectionType::WEST)->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(-2, 1));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
-		drawDebugPath(window, path->getPath(EAST));
+		drawDebugPath(window, path->getPath(DirectionType::WEST));
 	}
 
-	if (path->getPath(WEST) != nullptr)
+	if (path->getPath(DirectionType::EAST) != nullptr)
 	{
 		// Draw self path half line
-		m_debugLine.setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
-		m_debugLine.setOrigin(Vector2i(-2, 1));
+		m_debugRectangle->setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(-2, 1));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
 		// Draw next path line
-		m_debugLine.setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
-		m_debugLine.setPosition(Terrain::getWorldPositionCenter(path->getPath(WEST)->getPosition()));
-		m_debugLine.setOrigin(Vector2i(CELL_WIDTH / 2, 1));
+		m_debugRectangle->setSize(Vector2i(CELL_WIDTH / 2 - 2, 2));
+		m_debugRectangle->setPosition(Terrain::getWorldPositionCenter(path->getPath(DirectionType::EAST)->getPosition()));
+		m_debugRectangle->setOrigin(Vector2i(CELL_WIDTH / 2, 1));
 
-		window.draw(m_debugLine);
+		window.draw(*m_debugRectangle);
 
-		drawDebugPath(window, path->getPath(WEST));
+		drawDebugPath(window, path->getPath(DirectionType::EAST));
 	}
+
+	m_debugPathCount->setPosition(Terrain::getWorldPositionCenter(path->getPosition()));
+	m_debugPathCount->setString(std::to_string(path->getAdjacentPathCount()));
+	window.draw(*m_debugPathCount);
 }
 
 int TerrainView::calculateTerrainAutotilingIndex(const TerrainTileType& type, const Vector2i& pos, const bool& outsideIsSame, const std::vector<TerrainTileType>& ignoredTypes) const

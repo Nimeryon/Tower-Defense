@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 
+#include "TerrainTile.h"
+
 namespace sf
 {
 	class RenderWindow;
@@ -10,12 +12,12 @@ class Terrain;
 class Sprite;
 class Path;
 struct Vector2i;
-enum TerrainTileType;
 
 class TerrainView
 {
 public:
 	TerrainView();
+	~TerrainView();
 
 	void update();
 	void drawTerrain(sf::RenderWindow& window);
@@ -28,7 +30,8 @@ private:
 	Sprite* m_castleSprite;
 
 	// Debug values
-	sf::RectangleShape m_debugLine;
+	sf::RectangleShape* m_debugRectangle;
+	sf::Text* m_debugPathCount;
 
 	int calculateTerrainAutotilingIndex(const TerrainTileType& type, const Vector2i& pos, const bool& outsideIsSame, const std::vector<TerrainTileType>& ignoredTypes) const;
 };

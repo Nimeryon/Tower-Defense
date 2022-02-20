@@ -1,5 +1,6 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include <ostream>
+#include <SFML/System/Vector2.hpp>
 
 struct Vector2
 {

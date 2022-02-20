@@ -16,7 +16,7 @@ public:
 	static void addObject(GameObject* object);
 	static void destroyObject(GameObject* object);
 	static void drawObject(GameObject* object);
-	static void draw(sf::RenderWindow* window);
+	static void draw(sf::RenderWindow& window);
 
 	// Events
 	static Event<void> onStart;
@@ -24,6 +24,8 @@ public:
 	static Event<void> onUpdate;
 	static Event<void> onLateUpdate;
 	static Event<void> onEventTimerExecution;
+
+	static Event<sf::RenderWindow&> onDebugDraw;
 
 private:
 	static std::vector<GameObject*> m_objects;

@@ -20,7 +20,7 @@ public:
 	void setOrigin(const Vector2& origin) override;
 	void setScale(const Vector2& scale) override;
 	void setRotation(const float& rotation) override;
-	void setColor(const sf::Color& color) override;
+	virtual void setColor(const sf::Color& color);
 
 private:
 	sf::Sprite* m_sprite;

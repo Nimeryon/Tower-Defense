@@ -12,6 +12,7 @@ sf::Texture ResourceManager::m_waterBorderTexture = sf::Texture();
 sf::Texture ResourceManager::m_monsterTexture = sf::Texture();
 sf::Texture ResourceManager::m_towerTexture = sf::Texture();
 sf::Texture ResourceManager::m_startPathTexture = sf::Texture();
+sf::Texture ResourceManager::m_uiTexture = sf::Texture();
 
 sf::Font ResourceManager::m_font = sf::Font();
 
@@ -21,6 +22,7 @@ std::vector<sf::Sprite> ResourceManager::desertSprites = {};
 std::vector<sf::Sprite> ResourceManager::desertBorderSprites = {};
 std::vector<sf::Sprite> ResourceManager::waterSprites = {};
 std::vector<sf::Sprite> ResourceManager::dirtPathSprites = {};
+std::vector<sf::Sprite> ResourceManager::uiSprites = {};
 
 std::vector<AnimationSprite> ResourceManager::startPathSprites = {};
 std::vector<AnimationSprite> ResourceManager::waterBorderSprites = {};
@@ -45,6 +47,7 @@ bool ResourceManager::load()
 	if (!m_monsterTexture.loadFromFile("./Assets/Sprites/monster_tileset.png")) return false;
 	if (!m_towerTexture.loadFromFile("./Assets/Sprites/tower_tileset.png")) return false;
 	if (!m_startPathTexture.loadFromFile("./Assets/Sprites/start_path_tileset.png")) return false;
+	if (!m_uiTexture.loadFromFile("./Assets/Sprites/ui_tileset.png")) return false;
 
 	// Generating every terrain sprites from terrain texture
 	// Grass sprites
@@ -100,6 +103,9 @@ bool ResourceManager::load()
 	// Orc sprites
 	for (size_t i = 0; i < m_monsterTexture.getSize().x / 3 * CELL_WIDTH; ++i)
 		orcSprites.push_back(generateEntityAnimations(m_monsterTexture, i * 3, 3));
+	// UI Sprites
+	uiSprites.push_back(spriteFromTexture(m_uiTexture, Vector2i::zero(), Vector2i(16, 6)));
+
 
 	return true;
 }

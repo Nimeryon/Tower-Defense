@@ -156,7 +156,7 @@ void TerrainView::drawTerrain(sf::RenderWindow& window)
 		}
 	}
 
-	if (DEBUG_MODE) drawDebugPath(window, Terrain::terrain->getPath());
+	// if (DEBUG_MODE) drawDebugPath(window, Terrain::terrain->getPath());
 }
 
 void TerrainView::drawCastle(sf::RenderWindow& window)

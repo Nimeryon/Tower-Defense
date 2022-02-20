@@ -4,7 +4,6 @@
 #include "EngineHandler.h"
 #include "ResourceManager.h"
 #include "Time.h"
-#include "Vector2i.h"
 #include "Event.h"
 #include "TickSystem.h"
 

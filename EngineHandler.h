@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <chrono>
 
 namespace sf { class RenderWindow; }
 class GameObject;
@@ -31,6 +32,9 @@ private:
 	static std::vector<GameObject*> m_objects;
 	static std::vector<GameObject*> m_objectsToDestroy;
 	static std::vector<GameObject*> m_objectsToDraw;
+
+	static std::chrono::steady_clock::time_point m_timeBegin;
+	static std::chrono::steady_clock::time_point m_timeEnd;
 
 	static void clearObjectsToDestroy();
 };

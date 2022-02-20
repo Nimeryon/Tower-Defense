@@ -11,6 +11,7 @@
 #include "Time.h"
 #include "Enemy.h"
 #include "FpsCounter.h"
+#include "FrameTime.h"
 #include "TickSystem.h"
 #include "Random.h"
 
@@ -28,6 +29,7 @@ int WINDOW_HEIGHT = LEVEL_HEIGHT * CELL_HEIGTH * SCALE_FACTOR;
 std::string terrainEasyFilepath = "./Assets/Terrains/easy.txt";
 std::string terrainNormalFilepath = "./Assets/Terrains/normal.txt";
 std::string terrainHardFilepath = "./Assets/Terrains/hard.txt";
+std::string terrainLongFilepath = "./Assets/Terrains/long.txt";
 
 int main()
 {
@@ -40,18 +42,17 @@ int main()
 	TickSystem tick;
 
 	// Initialize terrain
-    Terrain* terrain = createTerrainFromFile(terrainEasyFilepath);
+    Terrain* terrain = createTerrainFromFile(terrainLongFilepath);
     TerrainView terrainView = TerrainView();
 
 	// Initialize fpsCounter
 	FpsCounter fpsCounter;
+	FrameTime frameTime;
 
 	// Initialize window and clock
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Tower Defense");
 	window.setFramerateLimit(120);
 	sf::Clock clock;
-
-	tick.onMiniEvent += EventHandler::bind([](){ new Enemy(100, 50, &ResourceManager::orcSprites[Random::random(0, 9)]); });
 
 	// Game loop
     while (window.isOpen())
@@ -71,29 +72,14 @@ int main()
 
 		// Update Systems
 		time.setTime(clock.restart().asSeconds());
+		FrameTime::frameTime->deltaTimeText->setString("DeltaTime " + std::to_string(Time::deltaTime * 1000) + "ms");
+
 		EngineHandler::update();
 		InputManager::update();
 
 		if (InputManager::isKeyDown(sf::Keyboard::F3)) DEBUG_MODE = !DEBUG_MODE;
 
-		if (InputManager::isKeyDown(sf::Keyboard::Num1))
-		{
-			delete terrain;
-			terrain = createTerrainFromFile(terrainEasyFilepath);
-			terrainView.update();
-		}
-		else if (InputManager::isKeyDown(sf::Keyboard::Num2))
-		{
-			delete terrain;
-			terrain = createTerrainFromFile(terrainNormalFilepath);
-			terrainView.update();
-		}
-		else if (InputManager::isKeyDown(sf::Keyboard::Num3))
-		{
-			delete terrain;
-			terrain = createTerrainFromFile(terrainHardFilepath);
-			terrainView.update();
-		}
+		new Enemy(100, 100, &ResourceManager::orcSprites[Random::random(0, 9)]);
 
         window.clear();
 

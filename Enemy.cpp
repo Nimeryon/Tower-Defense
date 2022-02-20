@@ -22,10 +22,10 @@ Enemy::Enemy(const int& health, const float& speed, EntitySprites* entitySprites
 	m_health(health),
 	m_speed(speed),
 	m_path(Terrain::terrain->getPath()),
-	m_posOffset(Vector2(Random::random(-4, 5), Random::random(-8, 9))),
+	m_posOffset(Vector2(Random::random(-4, 5), Random::random(-2, 13))),
 	m_sizeOffset(SCALE_FACTOR - .8)
 {
-	localTransform.setSize(Vector2i(CELL_WIDTH, CELL_HEIGTH));
+	setSize(Vector2i(CELL_WIDTH, CELL_HEIGTH));
 	setPosition(Terrain::getWorldPositionDirection(m_path->getPosition(), m_path->getOldDirection()) + m_posOffset);
 	setOriginAligned(Alignment::BOTTOMCENTER);
 
@@ -43,7 +43,7 @@ Enemy::~Enemy()
 
 void Enemy::update()
 {
-	setZOrder((localTransform.position.Y * WINDOW_WIDTH + localTransform.position.X) / (float)(WINDOW_WIDTH * WINDOW_HEIGHT));
+	setZOrder((localTransform.position.Y * WINDOW_WIDTH + localTransform.position.X));
 	followPath();
 }
 void Enemy::destroy()

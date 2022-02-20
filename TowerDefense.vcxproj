@@ -152,6 +152,7 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="FpsCounter.h" />
+    <ClInclude Include="FrameTime.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="HealthBar.h" />
     <ClInclude Include="InputManager.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="EngineHandler.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="FpsCounter.cpp" />
+    <ClCompile Include="FrameTime.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="HealthBar.cpp" />
     <ClCompile Include="InputManager.cpp" />

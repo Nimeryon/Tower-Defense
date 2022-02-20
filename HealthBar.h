@@ -10,6 +10,7 @@ class Sprite;
 class HealthBar : public GameObject
 {
 public:
+	explicit HealthBar(int width, int health = 100);
 	explicit HealthBar(int health = 100);
 	~HealthBar() override;
 
@@ -20,9 +21,10 @@ public:
 	void drawCall(sf::RenderWindow& window) override;
 
 private:
-	static constexpr float healthScaleFactor = 2.f;
+	static const Vector2 healthScale;
 	int m_health;
 	int m_maxHealth;
 
 	sf::RectangleShape* m_healthBar;
+	Sprite* m_healthDecorator;
 };

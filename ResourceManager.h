@@ -45,6 +45,7 @@ public:
 	static std::vector <sf::Sprite> desertBorderSprites;
 	static std::vector<sf::Sprite> waterSprites;
 	static std::vector<sf::Sprite> dirtPathSprites;
+	static std::vector<sf::Sprite> uiSprites;
 
 	static std::vector<AnimationSprite> startPathSprites;
 	static std::vector<AnimationSprite> waterBorderSprites;
@@ -61,6 +62,7 @@ private:
 	static sf::Texture m_towerTexture;
 	static sf::Texture m_waterBorderTexture;
 	static sf::Texture m_startPathTexture;
+	static sf::Texture m_uiTexture;
 
 	static AnimationSprite generateAnimationSprite(const sf::Texture& texture, const int& startRow, const int& startCol, const int& frameCount);
 	static EntitySprites generateEntityAnimations(const sf::Texture& texture, const int& startRow, const int& frameCount);

@@ -21,13 +21,11 @@ public:
 
 	void update();
 	void drawTerrain(sf::RenderWindow& window);
-	void drawCastle(sf::RenderWindow& window);
 
 	void drawDebugPath(sf::RenderWindow& window, Path* path);
 
 private:
 	std::vector<Sprite*> m_sprites;
-	Sprite* m_castleSprite;
 
 	// Debug values
 	sf::RectangleShape* m_debugRectangle;

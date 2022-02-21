@@ -32,7 +32,7 @@ Enemy::Enemy(const int& health, const float& speed, EntitySprites* entitySprites
 	setSprites(entitySprites);
 	setNextPosition();
 
-	addChildren(new HealthBar());
+	addChildren(new HealthBar(m_health, Vector2(0, -42)));
 }
 Enemy::~Enemy()
 {
@@ -44,6 +44,7 @@ Enemy::~Enemy()
 void Enemy::update()
 {
 	setZOrder((localTransform.position.Y * WINDOW_WIDTH + localTransform.position.X));
+	getChildren(0)->setZOrder(getZOrder() + 1);
 	followPath();
 }
 void Enemy::destroy()

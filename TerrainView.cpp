@@ -23,7 +23,6 @@ extern bool DEBUG_MODE;
 TerrainView::TerrainView() : m_debugRectangle(new sf::RectangleShape()), m_debugPathCount(new sf::Text())
 {
 	m_sprites.resize(LEVEL_WIDTH * LEVEL_HEIGHT);
-	m_castleSprite = new Sprite(&ResourceManager::castleSprite);
 
 	// Setup debugLine
 	m_debugRectangle->setScale(Vector2i(SCALE_FACTOR));
@@ -137,10 +136,6 @@ void TerrainView::update()
 			}
 		}
 	}
-	
-	m_castleSprite->setPosition(Terrain::getWorldPosition(Terrain::terrain->castlePosition));
-	m_castleSprite->setScale(Vector2(SCALE_FACTOR));
-	m_castleSprite->setOrigin(Vector2(CELL_WIDTH / 2.0f, CELL_HEIGTH - 1));
 }
 void TerrainView::drawTerrain(sf::RenderWindow& window)
 {
@@ -157,11 +152,6 @@ void TerrainView::drawTerrain(sf::RenderWindow& window)
 	}
 
 	// if (DEBUG_MODE) drawDebugPath(window, Terrain::terrain->getPath());
-}
-
-void TerrainView::drawCastle(sf::RenderWindow& window)
-{
-	window.draw(*m_castleSprite->getSprite());
 }
 
 void TerrainView::drawDebugPath(sf::RenderWindow& window, Path* path)

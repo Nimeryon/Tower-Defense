@@ -2,28 +2,34 @@
 
 #include "HealthBar.h"
 #include "Vector2i.h"
-#include "TickSystem.h"
 #include "Sprite.h"
 #include "ResourceManager.h"
+#include "Colors.h"
+#include "Math.h"
 
 extern int CELL_WIDTH;
 
-const Vector2 HealthBar::healthScale = Vector2(2.f, 1.f);
-HealthBar::HealthBar(int width, int health) :
+HealthBar::HealthBar(int health, Vector2 positionOffset, Vector2 healthScale) :
+	m_healthScale(healthScale),
+	m_positionOffset(positionOffset),
 	m_health(health),
 	m_maxHealth(health),
-	m_healthBar(new sf::RectangleShape())
+	m_fullLifeColor(sf::Color::Green),
+	m_emptyLifeColor(sf::Color::Red),
+	m_healthBar(new sf::RectangleShape()),
+	m_healthDecoratorTransform(Transform())
 {
-	setSize(Vector2i(width, 6));
-	setScale(healthScale);
+	setSize(Vector2i(CELL_WIDTH, 6));
+	setScale(m_healthScale);
 	setOriginAligned(Alignment::MIDDLECENTER);
-	setPosition(Vector2(0, -48));
+	setPosition(m_positionOffset);
 
 	m_healthDecorator = new Sprite(&ResourceManager::uiSprites[0]);
-
-	m_healthBar->setFillColor(sf::Color::Red);
+	m_healthDecoratorTransform.setScale(m_healthScale);
+	m_healthDecoratorTransform.setPosition(Vector2(-CELL_WIDTH * (m_healthScale.X / 2.f), 0));
+	m_healthDecoratorTransform.setSize(Vector2i(CELL_WIDTH, 6));
+	m_healthDecoratorTransform.setOriginAligned(Alignment::MIDDLELEFT);
 }
-HealthBar::HealthBar(int health) : HealthBar(CELL_WIDTH, health) {}
 HealthBar::~HealthBar()
 {
 	delete m_healthBar;
@@ -32,22 +38,20 @@ HealthBar::~HealthBar()
 void HealthBar::removeHealth(const int& health)
 {
 	m_health -= health;
-	setScale(Vector2(healthScale.X * ((float)m_health / (float)m_maxHealth), healthScale.Y));
+	setScale(Vector2(m_healthScale.X * getLifePercentage(), m_healthScale.Y));
 }
+float HealthBar::getLifePercentage() { return Math::clamp((float)m_health / (float)m_maxHealth, 0.f, 1.f); }
 
 void HealthBar::setSize(const Vector2i& size)
 {
 	m_healthBar->setSize(size);
 	GameObject::setSize(size);
 }
-void HealthBar::lateUpdate()
-{
-	setZOrder(parent->getZOrder() + 1);
-}
 void HealthBar::drawCall(sf::RenderWindow& window)
 {
 	transform.setTransformable(m_healthBar);
-	transform.setTransformable(m_healthDecorator->getSprite());
+	m_healthBar->setFillColor(Colors::lerpRGB(m_emptyLifeColor, m_fullLifeColor, getLifePercentage()));
+	Transform::compose(transform, m_healthDecoratorTransform).setTransformable(m_healthDecorator->getSprite());
 	window.draw(*m_healthBar);
 	window.draw(*m_healthDecorator->getSprite());
 }

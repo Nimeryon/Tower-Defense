@@ -43,9 +43,6 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{2f84bb04-d5b4-497e-9ee7-ea6bc9dc086f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Objects">
-      <UniqueIdentifier>{fc4c1a21-33c9-4312-9cf3-a0111224316b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Engine\Objects">
       <UniqueIdentifier>{ad447301-8ce5-47ca-b07f-8d25b4d1741b}</UniqueIdentifier>
     </Filter>
@@ -58,14 +55,17 @@
     <Filter Include="Source Files\Engine\Entities">
       <UniqueIdentifier>{f1697e50-8457-4005-91db-824ef2dc8b06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Engine\Objects\Interfaces">
-      <UniqueIdentifier>{8a9dd853-e8c9-4eb5-8120-4fb2d3fc0234}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Views\Debug">
       <UniqueIdentifier>{288a622b-32ea-48d5-b549-f8d54243776c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Views\Debug">
       <UniqueIdentifier>{2118fb18-c1b6-43cd-9a0a-3b8251c32313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Entities\Objects">
+      <UniqueIdentifier>{fc4c1a21-33c9-4312-9cf3-a0111224316b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Entities\Objects\Interfaces">
+      <UniqueIdentifier>{8a9dd853-e8c9-4eb5-8120-4fb2d3fc0234}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -106,7 +106,7 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>Header Files\Engine\Objects</Filter>
+      <Filter>Header Files\Engine\Entities\Objects</Filter>
     </ClInclude>
     <ClInclude Include="AnimatedSprite.h">
       <Filter>Header Files\Views</Filter>
@@ -130,7 +130,7 @@
       <Filter>Header Files\Engine\Entities</Filter>
     </ClInclude>
     <ClInclude Include="ITransform.h">
-      <Filter>Header Files\Engine\Objects\Interfaces</Filter>
+      <Filter>Header Files\Engine\Entities\Objects\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="TickSystem.h">
       <Filter>Header Files\Utils</Filter>
@@ -139,7 +139,7 @@
       <Filter>Header Files\Views</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
-      <Filter>Header Files\Engine\Objects</Filter>
+      <Filter>Header Files\Engine\Entities\Objects</Filter>
     </ClInclude>
     <ClInclude Include="HealthBar.h">
       <Filter>Header Files\Engine\Entities</Filter>
@@ -149,6 +149,12 @@
     </ClInclude>
     <ClInclude Include="FrameTime.h">
       <Filter>Header Files\Views\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Colors.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Castle.h">
+      <Filter>Header Files\Engine\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +226,12 @@
     </ClCompile>
     <ClCompile Include="FrameTime.cpp">
       <Filter>Source Files\Views\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Colors.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Castle.cpp">
+      <Filter>Source Files\Engine\Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

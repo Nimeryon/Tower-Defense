@@ -146,6 +146,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedSprite.h" />
+    <ClInclude Include="Castle.h" />
+    <ClInclude Include="Colors.h" />
     <ClInclude Include="Cursor.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="EngineHandler.h" />
@@ -175,6 +177,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimatedSprite.cpp" />
+    <ClCompile Include="Castle.cpp" />
+    <ClCompile Include="Colors.cpp" />
     <ClCompile Include="Direction.cpp" />
     <ClCompile Include="EngineHandler.cpp" />
     <ClCompile Include="Enemy.cpp" />

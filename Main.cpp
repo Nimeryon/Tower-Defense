@@ -14,6 +14,7 @@
 #include "FrameTime.h"
 #include "TickSystem.h"
 #include "Random.h"
+#include "Castle.h"
 
 // Global Variables
 int LEVEL_WIDTH = 32;
@@ -45,6 +46,9 @@ int main()
     Terrain* terrain = createTerrainFromFile(terrainLongFilepath);
     TerrainView terrainView = TerrainView();
 
+	// Initialize castle
+	new Castle(100);
+
 	// Initialize fpsCounter
 	FpsCounter fpsCounter;
 	FrameTime frameTime;
@@ -53,6 +57,8 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Tower Defense");
 	window.setFramerateLimit(120);
 	sf::Clock clock;
+
+	TickSystem::system->onSmallEvent += EventHandler::bind([]() { new Enemy(100, 100, &ResourceManager::orcSprites[1]); });
 
 	// Game loop
     while (window.isOpen())
@@ -79,13 +85,10 @@ int main()
 
 		if (InputManager::isKeyDown(sf::Keyboard::F3)) DEBUG_MODE = !DEBUG_MODE;
 
-		new Enemy(100, 100, &ResourceManager::orcSprites[Random::random(0, 9)]);
-
         window.clear();
 
         terrainView.drawTerrain(window);
 		EngineHandler::draw(window);
-		terrainView.drawCastle(window);
 
         window.display();
 

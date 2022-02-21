@@ -67,12 +67,12 @@ void EngineHandler::draw(sf::RenderWindow& window)
 	m_timeBegin = std::chrono::steady_clock::now();
 	std::sort(m_objectsToDraw.begin(), m_objectsToDraw.end(), [](GameObject* object1, GameObject* object2)
 		{ return object1->getZOrder() < object2->getZOrder(); });
+	m_timeEnd = std::chrono::steady_clock::now();
+	FrameTime::frameTime->drawTimeText->setString("Draw " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(m_timeEnd - m_timeBegin).count() / 1000.f) + "ms");
 
 	for (GameObject* object : m_objectsToDraw)
 		object->drawCall(window);
 	m_objectsToDraw.clear();
-	m_timeEnd = std::chrono::steady_clock::now();
-	FrameTime::frameTime->drawTimeText->setString("Draw " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(m_timeEnd - m_timeBegin).count() / 1000.f) + "ms");
 
 	m_timeBegin = std::chrono::steady_clock::now();
 	if (DEBUG_MODE) onDebugDraw(window);

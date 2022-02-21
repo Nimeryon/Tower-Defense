@@ -12,10 +12,10 @@ Transform::Transform(Vector2 position, Vector2i size, Vector2 scale, float rotat
 
 void Transform::setTransformable(sf::Transformable* transformable)
 {
-	if (Vector2::from(transformable->getPosition()) != position) transformable->setPosition(position);
-	if (transformable->getRotation() != rotation) transformable->setRotation(rotation);
-	if (Vector2::from(transformable->getScale()) != scale) transformable->setScale(scale);
-	if (Vector2::from(transformable->getOrigin()) != origin) transformable->setOrigin(origin);
+	transformable->setPosition(position);
+	transformable->setRotation(rotation);
+	transformable->setScale(scale);
+	transformable->setOrigin(origin);
 }
 
 void Transform::setPosition(const Vector2& position)
